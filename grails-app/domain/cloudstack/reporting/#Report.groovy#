@@ -1,0 +1,10 @@
+package cloudstack.reporting
+
+class Report {
+    ReportRun reportRun
+
+    
+
+    
+    
+}
