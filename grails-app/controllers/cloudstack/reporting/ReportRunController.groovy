@@ -1,3 +1,20 @@
+/**
+ * Licensed to Cloudera, Inc. under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  Cloudera, Inc. licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cloudstack.reporting
 
 import org.springframework.dao.DataIntegrityViolationException
@@ -31,7 +48,7 @@ class ReportRunController {
         //        def accounts = Instance.where { }.projections { distinct: 'account' }
         def accounts = Instance.executeQuery('select distinct account from Instance')
         
-        def rawInstCounts = Instance.executeQuery("select i.account, i.serviceOfferingName, count(i) from ReportRun as r join r.instances as i where r.id = ${reportRunId} group by i.account, i.serviceOfferingName")
+        def rawInstCounts = Instance.executeQuery("select i.account, i.serviceOfferingName, count(i) from ReportRun as r join r.instances as i where r.id = ${reportRunId} and i.state = 'Running' group by i.account, i.serviceOfferingName")
         def accountInstancesMap = [:]
 
         accounts.each { a ->
@@ -45,28 +62,47 @@ class ReportRunController {
             accountInstancesMap[r[0]]['total'] += r[2]
         }
 
+        def totalInstances = [:]
+        instanceSizes.each { s -> totalInstances[s] = 0 }
+        totalInstances['total'] = 0
+        
+        accountInstancesMap.each { acct, s ->
+            s.each { k, v ->
+                if (k != 'account')
+                    totalInstances[k] += v
+            }
+        }
 
+        def topSizes = totalInstances.sort { a, b -> b.value <=> a.value }.keySet().toList().findAll { it != "total" }[0..4]
+        
+        log.warn("topSizes: ${topSizes}")
+        def totalOther = 0
+        
+        totalInstances.each { k, v ->
+            if (!(k in topSizes) && k != "other" && k != "total") {
+                totalOther += v
+            }
+        }
+        totalInstances["other"] = totalOther
+        
+        accountInstancesMap.each { acct, s ->
+            def acctOther = 0
+            s.each { k, v ->
+                if (!(k in topSizes) && k != "account" && k != "other" && k != "total") {
+                    acctOther += v
+                }
+            }
+            accountInstancesMap[acct]["other"] = acctOther
+        }
+        
+        
         def accountInstances = accountInstancesMap.values().sort { it[params.sort] }
         if (params.order == 'desc') {
             accountInstances = accountInstances.reverse()
         }
-        [instanceSizes:instanceSizes, accountInstances: accountInstances, latestReportRun:latestReportRun]
+        [instanceSizes:instanceSizes, accountInstances: accountInstances, latestReportRun:latestReportRun, totalInstances:totalInstances,
+         topSizes:topSizes]
 
-    }
-
-    def create() {
-        [reportRunInstance: new ReportRun(params)]
-    }
-
-    def save() {
-        def reportRunInstance = new ReportRun(params)
-        if (!reportRunInstance.save(flush: true)) {
-            render(view: "create", model: [reportRunInstance: reportRunInstance])
-            return
-        }
-
-        flash.message = message(code: 'default.created.message', args: [message(code: 'reportRun.label', default: 'ReportRun'), reportRunInstance.id])
-        redirect(action: "show", id: reportRunInstance.id)
     }
 
     def show(Long id) {
@@ -78,64 +114,5 @@ class ReportRunController {
         }
 
         [reportRunInstance: reportRunInstance]
-    }
-
-    def edit(Long id) {
-        def reportRunInstance = ReportRun.get(id)
-        if (!reportRunInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'reportRun.label', default: 'ReportRun'), id])
-            redirect(action: "list")
-            return
-        }
-
-        [reportRunInstance: reportRunInstance]
-    }
-
-    def update(Long id, Long version) {
-        def reportRunInstance = ReportRun.get(id)
-        if (!reportRunInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'reportRun.label', default: 'ReportRun'), id])
-            redirect(action: "list")
-            return
-        }
-
-        if (version != null) {
-            if (reportRunInstance.version > version) {
-                reportRunInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'reportRun.label', default: 'ReportRun')] as Object[],
-                          "Another user has updated this ReportRun while you were editing")
-                render(view: "edit", model: [reportRunInstance: reportRunInstance])
-                return
-            }
-        }
-
-        reportRunInstance.properties = params
-
-        if (!reportRunInstance.save(flush: true)) {
-            render(view: "edit", model: [reportRunInstance: reportRunInstance])
-            return
-        }
-
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'reportRun.label', default: 'ReportRun'), reportRunInstance.id])
-        redirect(action: "show", id: reportRunInstance.id)
-    }
-
-    def delete(Long id) {
-        def reportRunInstance = ReportRun.get(id)
-        if (!reportRunInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'reportRun.label', default: 'ReportRun'), id])
-            redirect(action: "list")
-            return
-        }
-
-        try {
-            reportRunInstance.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'reportRun.label', default: 'ReportRun'), id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'reportRun.label', default: 'ReportRun'), id])
-            redirect(action: "show", id: id)
-        }
     }
 }

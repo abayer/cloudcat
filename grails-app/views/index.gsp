@@ -1,8 +1,27 @@
+<!--
+/**
+ * Licensed to Cloudera, Inc. under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  Cloudera, Inc. licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */ -->
 <!DOCTYPE html>
 <html>
 	<head>
 		<meta name="layout" content="main"/>
-		<title>Welcome to Grails</title>
+
+		<title>Welcome to CloudCat</title>
 		<style type="text/css" media="screen">
 			#status {
 				background-color: #eee;
@@ -82,41 +101,52 @@
 	</head>
 	<body>
 		<a href="#page-body" class="skip"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
-		<div id="status" role="complementary">
-			<h1>Application Status</h1>
-			<ul>
-				<li>App version: <g:meta name="app.version"/></li>
-				<li>Grails version: <g:meta name="app.grails.version"/></li>
-				<li>Groovy version: ${org.codehaus.groovy.runtime.InvokerHelper.getVersion()}</li>
-				<li>JVM version: ${System.getProperty('java.version')}</li>
-				<li>Reloading active: ${grails.util.Environment.reloadingAgentEnabled}</li>
-				<li>Controllers: ${grailsApplication.controllerClasses.size()}</li>
-				<li>Domains: ${grailsApplication.domainClasses.size()}</li>
-				<li>Services: ${grailsApplication.serviceClasses.size()}</li>
-				<li>Tag Libraries: ${grailsApplication.tagLibClasses.size()}</li>
-			</ul>
-			<h1>Installed Plugins</h1>
-			<ul>
-				<g:each var="plugin" in="${applicationContext.getBean('pluginManager').allPlugins}">
-					<li>${plugin.name} - ${plugin.version}</li>
-				</g:each>
-			</ul>
-		</div>
 		<div id="page-body" role="main">
-			<h1>Welcome to Grails</h1>
-			<p>Congratulations, you have successfully started your first Grails application! At the moment
-			   this is the default page, feel free to modify it to either redirect to a controller or display whatever
-			   content you may choose. Below is a list of controllers that are currently deployed in this application,
-			   click on each to execute its default action:</p>
+			<h1>Welcome to CloudCat</h1>
+			<p>CloudCat's functionality is listed below.</p>
 
 			<div id="controller-list" role="navigation">
-				<h2>Available Controllers:</h2>
-				<ul>
-					<g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-						<li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link></li>
-					</g:each>
-				</ul>
+                          <sec:ifLoggedIn>
+                            <h2>Logout</h2>
+                            <ul>
+                              <li class="controller"><g:link controller="logout">Logout</g:link></li>
+                            </ul>
+                          </sec:ifLoggedIn>
+                          <sec:ifNotLoggedIn>
+                            <h2>Login</h2>
+                            <ul>
+                              <li class="controller"><g:link controller="login">Login</g:link></li>
+                            </ul>
+                          </sec:ifNotLoggedIn>
+                          <h2>Provisioning:</h2>
+                          <ul>
+                            <li class="controller"><g:link controller="provisionedInstanceGroup" action="create">Provision New Instances</g:link></li>
+                            <sec:ifLoggedIn>
+                              <li class="controller"><g:link controller="provisionedInstanceGroup" action="list" params="[filter_username: sec.username(), filter_op_username:'Equal']">Report on My Provisioned Instance Groups</g:link></li>
+                              <li class="controller"><g:link controller="provisionedInstance" action="list" params="[filter_provisionedInstanceGroup_username: sec.username(), filter_op_provisionedInstanceGroup_username:'Equal']">My Provisioned Instances</g:link></li>
+                            </sec:ifLoggedIn>
+                            <li class="controller"><g:link controller="provisionedInstanceGroup">Report on All Provisioned Instance Groups</g:link></li>
+                            <li class="controller"><g:link controller="provisionedInstance">All Provisioned Instances</g:link></li>
+                          </ul>
+                          <h2>Available Reports:</h2>
+                          <ul>
+                            <li class="controller"><g:link controller="reportRun">Instance Usage Reports</g:link></li>
+                            <li class="controller"><g:link controller="instance">All Instances</g:link></li>
+                            <li class="controller"><g:link controller="host">All Hosts</g:link></li>
+                            <li class="controller"><g:link controller="template">All Templates</g:link></li>
+                          </ul>
+                          
+                          <sec:access expression="hasRole('ROLE_ADMIN')">
+                            <h2>Admin:</h2>
+                            <ul>
+                              <li class="controller"><g:link controller="logging">CloudCat Logging</g:link></li>
+                              <li class="controller"><g:link controller="cloudStackConfig">Configuration</g:link></li>
+                              <li class="controller"><g:link controller="user">User Admin</g:link></li>
+                              <li class="controller"><g:link controller="role">Role/Group Admin</g:link></li>
+                            </ul>
+                          </sec:access>
 			</div>
 		</div>
 	</body>
 </html>
+

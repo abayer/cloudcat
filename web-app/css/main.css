@@ -47,8 +47,9 @@ body {
 	        box-shadow: 0 0 0.3em #255b17;
 }
 
-#grailsLogo {
-	background-color: #abbf78;
+#cloudstackLogo {
+                  background-color: #4B5E69;
+/*	background-color: #abbf78; */
 }
 
 /* replace with .no-boxshadow body if you have modernizr available */
@@ -65,7 +66,7 @@ body {
 }
 
 a:link, a:visited, a:hover {
-	color: #48802c;
+	color: #2e5ce6;
 }
 
 a:hover, a:active {
@@ -73,7 +74,7 @@ a:hover, a:active {
 }
 
 h1 {
-	color: #48802c;
+	color: #2e5ce6;
 	font-weight: normal;
 	font-size: 1.25em;
 	margin: 0.8em 0 0.3em 0;
@@ -108,7 +109,7 @@ img {
 }
 
 .footer {
-	background: #abbf78;
+	background: #4B5E69;
 	color: #000;
 	clear: both;
 	font-size: 0.8em;
@@ -283,7 +284,7 @@ input:focus, select:focus, textarea:focus {
 }
 
 .required-indicator {
-	color: #48802C;
+	color: #2E5CE6;
 	display: inline-block;
 	font-weight: bold;
 	margin-left: 0.3em;
@@ -476,7 +477,7 @@ th.desc a {
 }
 
 th:hover, tr:hover {
-	background: #E1F2B6;
+	background: #c2e0ff;
 }
 
 /* PAGINATION */
@@ -593,4 +594,20 @@ th:hover, tr:hover {
 a.skip {
 	position: absolute;
 	left: -9999px;
+}
+
+#cc_header {
+	overflow: hidden;
+}
+
+#cc_login_header_body {
+	width: 960px;
+}
+
+#cc_login_link_container {
+	position: relative;
+	padding: 0.5em 0.75em;
+/*	top: 14px;
+	right: 10px;*/
+	float: right;
 }

@@ -1,3 +1,20 @@
+/**
+ * Licensed to Cloudera, Inc. under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  Cloudera, Inc. licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cloudstack.reporting
 
 
@@ -11,8 +28,6 @@ class ReportRunControllerTests {
 
     def populateValidParams(params) {
         assert params != null
-        // TODO: Populate valid properties like...
-        //params["name"] = 'someValidName'
     }
 
     void testIndex() {
@@ -24,30 +39,8 @@ class ReportRunControllerTests {
 
         def model = controller.list()
 
-        assert model.reportRunInstanceList.size() == 0
-        assert model.reportRunInstanceTotal == 0
-    }
-
-    void testCreate() {
-        def model = controller.create()
-
-        assert model.reportRunInstance != null
-    }
-
-    void testSave() {
-        controller.save()
-
-        assert model.reportRunInstance != null
-        assert view == '/reportRun/create'
-
-        response.reset()
-
-        populateValidParams(params)
-        controller.save()
-
-        assert response.redirectedUrl == '/reportRun/show/1'
-        assert controller.flash.message != null
-        assert ReportRun.count() == 1
+        assert model.reportRunList.size() == 0
+        assert model.reportRunTotal == 0
     }
 
     void testShow() {
@@ -66,90 +59,5 @@ class ReportRunControllerTests {
         def model = controller.show()
 
         assert model.reportRunInstance == reportRun
-    }
-
-    void testEdit() {
-        controller.edit()
-
-        assert flash.message != null
-        assert response.redirectedUrl == '/reportRun/list'
-
-        populateValidParams(params)
-        def reportRun = new ReportRun(params)
-
-        assert reportRun.save() != null
-
-        params.id = reportRun.id
-
-        def model = controller.edit()
-
-        assert model.reportRunInstance == reportRun
-    }
-
-    void testUpdate() {
-        controller.update()
-
-        assert flash.message != null
-        assert response.redirectedUrl == '/reportRun/list'
-
-        response.reset()
-
-        populateValidParams(params)
-        def reportRun = new ReportRun(params)
-
-        assert reportRun.save() != null
-
-        // test invalid parameters in update
-        params.id = reportRun.id
-        //TODO: add invalid values to params object
-
-        controller.update()
-
-        assert view == "/reportRun/edit"
-        assert model.reportRunInstance != null
-
-        reportRun.clearErrors()
-
-        populateValidParams(params)
-        controller.update()
-
-        assert response.redirectedUrl == "/reportRun/show/$reportRun.id"
-        assert flash.message != null
-
-        //test outdated version number
-        response.reset()
-        reportRun.clearErrors()
-
-        populateValidParams(params)
-        params.id = reportRun.id
-        params.version = -1
-        controller.update()
-
-        assert view == "/reportRun/edit"
-        assert model.reportRunInstance != null
-        assert model.reportRunInstance.errors.getFieldError('version')
-        assert flash.message != null
-    }
-
-    void testDelete() {
-        controller.delete()
-        assert flash.message != null
-        assert response.redirectedUrl == '/reportRun/list'
-
-        response.reset()
-
-        populateValidParams(params)
-        def reportRun = new ReportRun(params)
-
-        assert reportRun.save() != null
-        assert ReportRun.count() == 1
-
-        params.id = reportRun.id
-
-        controller.delete()
-
-        assert ReportRun.count() == 0
-        assert ReportRun.get(reportRun.id) == null
-        assert response.redirectedUrl == '/reportRun/list'
     }
 }

@@ -1,33 +1,107 @@
+/**
+ * Licensed to Cloudera, Inc. under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  Cloudera, Inc. licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cloudstack.reporting
 
 import org.springframework.dao.DataIntegrityViolationException
+import grails.gorm.DetachedCriteria
+import grails.converters.JSON
+import org.apache.commons.logging.LogFactory
 
 class InstanceController {
+    private static final log = LogFactory.getLog(this)
 
     static allowedMethods = [save: "POST", update: "POST", delete: "POST"]
+
+    def filterPaneService
 
     def index() {
         redirect(action: "list", params: params)
     }
 
+    def filterAjax = {
+        render filterBase() as JSON
+    }
+    
+    def filterBase = {
+        [instanceInstanceList: filterPaneService.filter(params, Instance).collect { def i = Instance.read(it.id); i.reportRuns = []; i.cpuUsages = []; i},
+         instanceInstanceTotal: filterPaneService.count(params, Instance),
+         filterParams: org.grails.plugin.filterpane.FilterPaneUtils.extractFilterParams(params), 
+         params:params]
+    }
+
+    def filter() {
+        params.max = params.max != null ? params.max as int : 10
+        params.max = Math.min(params.max as int ?: 10, 100)
+        render(view: 'list', model: filterBase())
+    }
+
     def list(Integer max) {
         params.max = Math.min(max ?: 10, 100)
-        [instanceInstanceList: Instance.list(params), instanceInstanceTotal: Instance.count()]
+        def newParams = [:]
+        params.each { k, v ->
+            if (k.contains("filter_")) {
+                k = k.replaceAll("_", ".")
+            }
+            newParams[k] = v
+        }
+        redirect(action:'filter', params:newParams)
     }
 
-    def create() {
-        [instanceInstance: new Instance(params)]
-    }
+    def find(Integer max) {
+        params.max = Math.min(max ?: 10, 100)
+        def sortTok = params.sort ?: "name"
+        def orderTok = params.order ?: "asc"
+        def latestReportRunId = ReportRun.findAllByCompleted(true).collect { it.id }.max()
+                
+        def queryReportRun = ReportRun.get(params.reportRun ? params.reportRun.toLong(): latestReportRunId)
 
-    def save() {
-        def instanceInstance = new Instance(params)
-        if (!instanceInstance.save(flush: true)) {
-            render(view: "create", model: [instanceInstance: instanceInstance])
-            return
+        def queryTemplate
+
+        if (params.templateId) {
+            queryTemplate = Template.get(params.templateId)
         }
 
-        flash.message = message(code: 'default.created.message', args: [message(code: 'instance.label', default: 'Instance'), instanceInstance.id])
-        redirect(action: "show", id: instanceInstance.id)
+        def instanceQuery = new DetachedCriteria(Instance).build {
+            and {
+                if (params.templateId != null && !params.templateId.equals('')) {
+                    eq("csTemplateId", queryTemplate.templateId)
+                }
+
+                if (params.account != null && !params.account.equals('')) { 
+                    eq("account", params.account)
+                }
+
+                ge("lastUpdated", queryReportRun.dateCreated)
+                ne("state", "Destroyed")
+            }
+        } 
+
+        def instanceInstanceList = instanceQuery.list(max:params.max ?: 0,
+                                                      offset:params.offset ?: 0) { 
+            order(sortTok, orderTok)
+        }
+        
+        def instanceInstanceTotal = instanceQuery.list().size()
+
+        [account: params.account, reportRun: params.reportRun, templateId: params.templateId,
+         templateName: queryTemplate?.name ?: "(none)",
+         instanceInstanceList: instanceInstanceList,
+         instanceInstanceTotal: instanceInstanceTotal]
     }
 
     def show(Long id) {
@@ -39,64 +113,5 @@ class InstanceController {
         }
 
         [instanceInstance: instanceInstance]
-    }
-
-    def edit(Long id) {
-        def instanceInstance = Instance.get(id)
-        if (!instanceInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'instance.label', default: 'Instance'), id])
-            redirect(action: "list")
-            return
-        }
-
-        [instanceInstance: instanceInstance]
-    }
-
-    def update(Long id, Long version) {
-        def instanceInstance = Instance.get(id)
-        if (!instanceInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'instance.label', default: 'Instance'), id])
-            redirect(action: "list")
-            return
-        }
-
-        if (version != null) {
-            if (instanceInstance.version > version) {
-                instanceInstance.errors.rejectValue("version", "default.optimistic.locking.failure",
-                          [message(code: 'instance.label', default: 'Instance')] as Object[],
-                          "Another user has updated this Instance while you were editing")
-                render(view: "edit", model: [instanceInstance: instanceInstance])
-                return
-            }
-        }
-
-        instanceInstance.properties = params
-
-        if (!instanceInstance.save(flush: true)) {
-            render(view: "edit", model: [instanceInstance: instanceInstance])
-            return
-        }
-
-        flash.message = message(code: 'default.updated.message', args: [message(code: 'instance.label', default: 'Instance'), instanceInstance.id])
-        redirect(action: "show", id: instanceInstance.id)
-    }
-
-    def delete(Long id) {
-        def instanceInstance = Instance.get(id)
-        if (!instanceInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'instance.label', default: 'Instance'), id])
-            redirect(action: "list")
-            return
-        }
-
-        try {
-            instanceInstance.delete(flush: true)
-            flash.message = message(code: 'default.deleted.message', args: [message(code: 'instance.label', default: 'Instance'), id])
-            redirect(action: "list")
-        }
-        catch (DataIntegrityViolationException e) {
-            flash.message = message(code: 'default.not.deleted.message', args: [message(code: 'instance.label', default: 'Instance'), id])
-            redirect(action: "show", id: id)
-        }
     }
 }

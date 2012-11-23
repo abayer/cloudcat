@@ -1,3 +1,21 @@
+/**
+ * Licensed to Cloudera, Inc. under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  Cloudera, Inc. licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 // locations to search for config files that get merged into the main config;
 // config files can be ConfigSlurper scripts, Java properties files, or classes
 // in the classpath in ConfigSlurper format
@@ -88,7 +106,8 @@ log4j = {
         }
     }
 
-    debug 'grails.app.jobs', 'cloudstack.reporting'
+    debug 'grails.app.jobs', 'cloudstack.reporting', 'org.grails.jquery.validation.ui'
+
     error  'org.codehaus.groovy.grails.web.servlet',        // controllers
            'org.codehaus.groovy.grails.web.pages',          // GSP
            'org.codehaus.groovy.grails.web.sitemesh',       // layouts
@@ -99,5 +118,43 @@ log4j = {
            'org.codehaus.groovy.grails.orm.hibernate',      // hibernate integration
            'org.springframework',
            'org.hibernate',
-           'net.sf.ehcache.hibernate'
+           'net.sf.ehcache.hibernate',
+           'org.jclouds', 'jclouds.compute', 'jclouds.wire', 'jclouds.ssh',
+           'org.springframework.security', 'org.codehaus.groovy.grails.plugins.springsecurity', 'grails.plugins.springsecurity'
 }
+
+
+
+grails.config.locations = [ "classpath:${appName}-config.properties",
+                            "classpath:${appName}-config.groovy",
+                            "file:${userHome}/.grails/${appName}-config.properties",
+                            "file:${userHome}/.grails/${appName}-config.groovy" ];
+                            
+if (System.properties["${appName}.config.location"]) {
+    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
+}
+
+// Added by the Spring Security Core plugin:
+grails.plugins.springsecurity.userLookup.userDomainClassName = 'cloudstack.reporting.SecUser'
+grails.plugins.springsecurity.userLookup.authorityJoinClassName = 'cloudstack.reporting.SecUserSecRole'
+grails.plugins.springsecurity.authority.className = 'cloudstack.reporting.SecRole'
+
+
+// For our role management
+grails.plugins.springsecurity.ldap.authorities.retrieveDatabaseRoles = true
+
+
+grails.plugins.springsecurity.controllerAnnotations.staticRules = [
+   '/user/**': ['ROLE_ADMIN'],
+   '/acl*/**': ['ROLE_ADMIN'],
+   '/requestmap/**': ['ROLE_ADMIN'],
+   '/registrationCode/**': ['ROLE_ADMIN'],
+   '/securityInfo/**': ['ROLE_ADMIN'],
+   '/role/**': ['ROLE_ADMIN'],
+   '/console/**': ['ROLE_ADMIN']
+]
+
+grails.views.javascript.library="jquery"
+
+            
+         

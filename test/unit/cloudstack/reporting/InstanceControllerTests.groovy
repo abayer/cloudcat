@@ -1,3 +1,20 @@
+/**
+ * Licensed to Cloudera, Inc. under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  Cloudera, Inc. licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package cloudstack.reporting
 
 
@@ -11,8 +28,19 @@ class InstanceControllerTests {
 
     def populateValidParams(params) {
         assert params != null
-        // TODO: Populate valid properties like...
-        //params["name"] = 'someValidName'
+        
+        params.instanceId = "abc"
+        params.account = "def"
+        params.name = "ghi" 
+        params.state = "Running"
+        params.cpuCount = 1.0
+        params.created = new Date()
+        params.publicIPs = "1.2.3.4"
+        params.memory = 1.0
+        params.templateId = "jkl"
+        params.templateName = "mno"
+        params.serviceOfferingName = "pqr"
+        params.rootDeviceId = "stu"
     }
 
     void testIndex() {
@@ -22,36 +50,14 @@ class InstanceControllerTests {
 
     void testList() {
 
-        def model = controller.list()
+        def model = controller.list(10)
 
         assert model.instanceInstanceList.size() == 0
         assert model.instanceInstanceTotal == 0
     }
 
-    void testCreate() {
-        def model = controller.create()
-
-        assert model.instanceInstance != null
-    }
-
-    void testSave() {
-        controller.save()
-
-        assert model.instanceInstance != null
-        assert view == '/instance/create'
-
-        response.reset()
-
-        populateValidParams(params)
-        controller.save()
-
-        assert response.redirectedUrl == '/instance/show/1'
-        assert controller.flash.message != null
-        assert Instance.count() == 1
-    }
-
     void testShow() {
-        controller.show()
+        controller.show(1)
 
         assert flash.message != null
         assert response.redirectedUrl == '/instance/list'
@@ -60,96 +66,10 @@ class InstanceControllerTests {
         def instance = new Instance(params)
 
         assert instance.save() != null
-
         params.id = instance.id
 
-        def model = controller.show()
+        def model = controller.show(params.id)
 
         assert model.instanceInstance == instance
-    }
-
-    void testEdit() {
-        controller.edit()
-
-        assert flash.message != null
-        assert response.redirectedUrl == '/instance/list'
-
-        populateValidParams(params)
-        def instance = new Instance(params)
-
-        assert instance.save() != null
-
-        params.id = instance.id
-
-        def model = controller.edit()
-
-        assert model.instanceInstance == instance
-    }
-
-    void testUpdate() {
-        controller.update()
-
-        assert flash.message != null
-        assert response.redirectedUrl == '/instance/list'
-
-        response.reset()
-
-        populateValidParams(params)
-        def instance = new Instance(params)
-
-        assert instance.save() != null
-
-        // test invalid parameters in update
-        params.id = instance.id
-        //TODO: add invalid values to params object
-
-        controller.update()
-
-        assert view == "/instance/edit"
-        assert model.instanceInstance != null
-
-        instance.clearErrors()
-
-        populateValidParams(params)
-        controller.update()
-
-        assert response.redirectedUrl == "/instance/show/$instance.id"
-        assert flash.message != null
-
-        //test outdated version number
-        response.reset()
-        instance.clearErrors()
-
-        populateValidParams(params)
-        params.id = instance.id
-        params.version = -1
-        controller.update()
-
-        assert view == "/instance/edit"
-        assert model.instanceInstance != null
-        assert model.instanceInstance.errors.getFieldError('version')
-        assert flash.message != null
-    }
-
-    void testDelete() {
-        controller.delete()
-        assert flash.message != null
-        assert response.redirectedUrl == '/instance/list'
-
-        response.reset()
-
-        populateValidParams(params)
-        def instance = new Instance(params)
-
-        assert instance.save() != null
-        assert Instance.count() == 1
-
-        params.id = instance.id
-
-        controller.delete()
-
-        assert Instance.count() == 0
-        assert Instance.get(instance.id) == null
-        assert response.redirectedUrl == '/instance/list'
     }
 }
