@@ -18,6 +18,7 @@
  */ -->
 
 <%@ page import="cloudstack.reporting.Instance" %>
+<%@ page import="cloudstack.reporting.CpuUsage" %>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -25,7 +26,8 @@
 
 		<g:set var="entityName" value="${message(code: 'instance.label', default: 'Instance')}" />
 		<title><g:message code="default.show.label" args="[entityName]" /></title>
-	</head>
+                <gvisualization:apiImport/>
+              </head>
 	<body>
 		<a href="#show-instance" class="skip" tabindex="-1"><g:message code="default.link.skip.label" default="Skip to content&hellip;"/></a>
 		<div class="nav" role="navigation">
@@ -97,19 +99,20 @@
 
                                 <g:if test="${instanceInstance?.cpuCount}">
 				<li class="fieldcontain">
-					<span id="cpuCount-label" class="property-label"><g:message code="instance.cpuCount.label" default="Cpu Count" /></span>
+					<span id="cpuCount-label" class="property-label"><g:message code="instance.cpuCount.label" default="CPU Count" /></span>
 					
 						<span class="property-value" aria-labelledby="cpuCount-label"><g:fieldValue bean="${instanceInstance}" field="cpuCount"/></span>
-					
 				</li>
 				</g:if>
 			
                                 <g:if test="${instanceInstance?.cpuUsages}">
 				<li class="fieldcontain">
-					<span id="cpuUsages-label" class="property-label"><g:message code="instance.cpuUsages.label" default="Cpu Used" /></span>
-					
-						<span class="property-value" aria-labelledby="cpuUsages-label"><g:link controller="cpuUsage" action="list" params="[instanceId:instanceInstance.id,sort:dateCreated,order:desc]">CPU Usage Report</g:link></span>
-					
+					<span id="cpuUsages-label" class="property-label"><g:message code="instance.cpuUsages.label" default="CPU Used" /></span>
+                                        <gvisualization:areaCoreChart elementId="cpuUsageChart" width="${400}" height="${240}" title="Last five days of CPU usage"
+                                                                      columns="${[['string', 'Time'], ['number', 'Usage']]}"
+                                                                      data="${cpuUsages}" />
+                                        <span class="property-value" aria-labelledby="cpuUsages-label"><div id="cpuUsageChart"></div></span>
+                                     					
 				</li>
 				</g:if>
 

@@ -107,11 +107,35 @@ class InstanceController {
     def show(Long id) {
         def instanceInstance = Instance.get(id)
         if (!instanceInstance) {
-            flash.message = message(code: 'default.not.found.message', args: [message(code: 'instance.label', default: 'Instance'), id])
+            Flash.message = message(code: 'default.not.found.message', args: [message(code: 'instance.label', default: 'Instance'), id])
             redirect(action: "list")
             return
         }
 
-        [instanceInstance: instanceInstance]
+        def cpuUsagesRaw = CpuUsage.findAllByInstance(instanceInstance, [sort: 'dateCreated', order: 'desc', max: '120'])
+        def cpuUsages = cpuUsagesRaw.collect { c ->
+            ["${hoursAgo(c.dateCreated)} ago", c.cpuUsage]
+        }.reverse()
+
+        [instanceInstance: instanceInstance, cpuUsages: cpuUsages]
+    }
+
+    def hoursAgo(d) {
+        use (groovy.time.TimeCategory) {
+            def now = new Date()
+            def duration = now - d
+
+            if (duration.days > 0) {
+                return "${(duration.days * 24) + duration.hours} hours"
+            } else if (duration.hours > 1) {
+                return "${duration.hours} hours"
+            } else if (duration.hours > 0) {
+                return "${duration.hours} hour"
+            } else if (duration.minutes > 1) {
+                return "${duration.minutes} mins"
+            } else { 
+                return "${duration.minutes} min"
+            }
+        }
     }
 }
