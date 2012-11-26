@@ -148,6 +148,7 @@ class HostController {
     }
 
     def show(Long id) {
+        def latestReportRunId = ReportRun.findAllByCompleted(true).collect { it.id }.max()
         def hostInstance = Host.get(id)
         if (!hostInstance) {
             Flash.message = message(code: 'default.not.found.message', args: [message(code: 'host.label', default: 'Host'), id])
@@ -155,7 +156,7 @@ class HostController {
             return
         }
 
-        [hostInstance: hostInstance]
+        [hostInstance: hostInstance, latestReportRunId: latestReportRunId]
     }
 
     def list(Integer max) {
