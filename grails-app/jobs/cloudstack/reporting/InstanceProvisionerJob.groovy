@@ -174,9 +174,19 @@ class InstanceProvisionerJob {
             templateBuilder.hardwareId(g.alternateServiceOffering.offeringId)
         }
 
-        log.debug("about to do account bits")
-        try { 
-            templateBuilder.options(CloudStackTemplateOptions.Builder.setupStaticNat(false))
+        log.debug("about to do network bits")
+        try {
+            def csto
+            if (csCfg.setupStaticNat) {
+                csto = CloudStackTemplateOptions.Builder.setupStaticNat(true)
+            } else {
+                csto = CloudStackTemplateOptions.Builder.setupStaticNat(false)
+            }
+
+            if (csCfg.networkId != null && csCfg.networkId != "") {
+                csto.networkId(csCfg.networkId)
+            }
+            templateBuilder.options(csto)
         } catch (Exception e) {
             log.error("Error setting template options: ${e}, ${e.getStackTrace()}")
             i.provisionStatus = 2
@@ -184,7 +194,7 @@ class InstanceProvisionerJob {
             i.merge(flush:true)
             return null
         }
-        log.debug("did account bits")
+        log.debug("did network bits")
         def template = templateBuilder.build()
 
         return template

@@ -65,6 +65,21 @@
 	<g:textField name="emailDomain" required="" value="${cloudStackConfigInstance?.emailDomain}"/>
 </div>
 
+<div class="fieldcontain ${hasErrors(bean: cloudStackConfigInstance, field: 'setupStaticNat', 'error')} ">
+	<label for="setupStaticNat">
+		<g:message code="cloudStackConfig.setupStaticNat.label" default="Setup static NAT?" />
+		
+	</label>
+	<g:checkBox name="setupStaticNat" value="${cloudStackConfigInstance?.setupStaticNat}"/>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: cloudStackConfigInstance, field: 'networkId', 'error')}">
+	<label for="networkId">
+		<g:message code="cloudStackConfig.networkId.label" default="Optional Network ID" />
+	</label>
+	<g:textField name="networkId" required="" value="${cloudStackConfigInstance?.networkId}"/>
+</div>
+
 <div class="fieldcontain ${hasErrors(bean: cloudStackConfigInstance, field: 'maxProvDestroy', 'error')} required">
 	<label for="maxProvDestroy">
 		<g:message code="cloudStackConfig.maxProvDestroy.label" default="Maximum # of Concurrent Provisions" />

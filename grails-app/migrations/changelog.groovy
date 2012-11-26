@@ -1036,4 +1036,6 @@ databaseChangeLog = {
 		addForeignKeyConstraint(baseColumnNames: "sec_user_id", baseTableName: "sec_user_sec_role", constraintName: "FK6630E2AFEA2442", deferrable: "false", initiallyDeferred: "false", referencedColumnNames: "id", referencedTableName: "sec_user", referencesUniqueColumn: "false")
 	}
 
+
+	include file: 'add-network-options-to-cscfg.groovy'
 }

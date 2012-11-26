@@ -24,6 +24,9 @@ class CloudStackConfig {
     String alertEmailFrom
     String alertEmailTo
     String emailDomain
+    boolean setupStaticNat
+    String networkId
+    
     int maxProvDestroy = 10
     Date lastUpdated
     
@@ -35,5 +38,7 @@ class CloudStackConfig {
         alertEmailTo(nullable: true)
         emailDomain(nullable:true)
         maxProvDestroy(min:1)
+        setupStaticNat(nullable:true)
+        networkId(nullable:true)
     }
 }

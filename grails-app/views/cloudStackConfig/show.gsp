@@ -96,6 +96,24 @@
 				</li>
 				</g:if>
 
+				<g:if test="${cloudStackConfigInstance?.setupStaticNat}">
+				<li class="fieldcontain">
+					<span id="setupStaticNat-label" class="property-label"><g:message code="cloudStackConfig.setupStaticNat.label" default="Setup static NAT?" /></span>
+					
+						<span class="property-value" aria-labelledby="setupStaticNat-label"><g:fieldValue bean="${cloudStackConfigInstance}" field="setupStaticNat"/></span>
+					
+				</li>
+				</g:if>
+
+				<g:if test="${cloudStackConfigInstance?.networkId}">
+				<li class="fieldcontain">
+					<span id="networkId-label" class="property-label"><g:message code="cloudStackConfig.networkId.label" default="Optional Network ID" /></span>
+					
+						<span class="property-value" aria-labelledby="networkId-label"><g:fieldValue bean="${cloudStackConfigInstance}" field="networkId"/></span>
+					
+				</li>
+				</g:if>
+
                                 <g:if test="${cloudStackConfigInstance?.maxProvDestroy}">
 				<li class="fieldcontain">
 					<span id="maxProvDestroy-label" class="property-label"><g:message code="cloudStackConfig.maxProvDestroy.label" default="Max # of Concurrent Provisions" /></span>
