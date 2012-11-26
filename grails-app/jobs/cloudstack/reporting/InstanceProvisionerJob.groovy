@@ -187,12 +187,6 @@ class InstanceProvisionerJob {
         log.debug("did account bits")
         def template = templateBuilder.build()
 
-        if (csCfg.instanceAdminUser != null) { 
-            LoginCredentials lc = LoginCredentials.builder().user(csCfg.instanceAdminUser).password(csCfg.instanceAdminPassword).build()
-            template.getOptions().overrideLoginCredentials(lc)
-            log.debug("Setting creds for ${csCfg.instanceAdminUser}")
-        }
-
         return template
 
     }
@@ -248,8 +242,7 @@ class InstanceProvisionerJob {
                 if (provisionGroup.initScript != null) {
                     runScript = Statements.exec(provisionGroup.initScript)
 
-                    def execResp = computeSvc.runScriptOnNode(vm.getNodeId(), runScript,
-                                                              RunScriptOptions.Builder.overrideLoginUser(csCfg.instanceAdminUser).overrideLoginPassword(csCfg.instanceAdminPassword))
+                    def execResp = computeSvc.runScriptOnNode(vm.getNodeId(), runScript)
                     if (execResp.getExitStatus() > 0) {
                         log.debug("runScript error")
                         adminCtx.getGlobalContext().getApi().getVirtualMachineClient().destroyVirtualMachine(vm.getNode().id)       
