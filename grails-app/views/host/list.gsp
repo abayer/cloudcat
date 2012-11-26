@@ -37,7 +37,7 @@
 		</div>
                 <div>
                   <filterpane:filterPane domain="cloudstack.reporting.Host"
-                                         filterProperties="name,tags,state"
+                                         filterProperties="name,tags,state,hostId"
                                          titleKey="fp.tag.filterPane.titleText"/>
                   <filterpane:currentCriteria style="margin-left: 5%; margin-top: 1em;" domainBean="${Host}" />
                 </div>
