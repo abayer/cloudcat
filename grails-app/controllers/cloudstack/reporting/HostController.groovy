@@ -147,6 +147,16 @@ class HostController {
         render(view: 'list', model: filterBase())
     }
 
+    def show(Long id) {
+        def hostInstance = Host.get(id)
+        if (!hostInstance) {
+            Flash.message = message(code: 'default.not.found.message', args: [message(code: 'host.label', default: 'Host'), id])
+            redirect(action: "list")
+            return
+        }
+
+        [hostInstance: hostInstance]
+    }
 
     def list(Integer max) {
         params.max = Math.min(max ?: 10, 100)
