@@ -73,7 +73,15 @@ class ReportRunController {
             }
         }
 
-        def topSizes = totalInstances.sort { a, b -> b.value <=> a.value }.keySet().toList().findAll { it != "total" }[0..4]
+        def topSizesRaw = totalInstances.sort { a, b -> b.value <=> a.value }.keySet().toList().findAll { it != "total" }
+
+        def topSizes
+
+        if (topSizesRaw.size() > 5) {
+            topSizes = topSizesRaw[0..4]
+        } else {
+            topSizes = topSizesRaw
+        }
         
         log.warn("topSizes: ${topSizes}")
         def totalOther = 0
