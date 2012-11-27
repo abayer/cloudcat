@@ -34,6 +34,9 @@ class ProvisionedInstanceGroupStatusJob {
             def csCfg = CloudStackConfig.where { lastUpdated >= max(lastUpdated) }.find()
             ProvisionedInstanceGroup.findAllByProvisionStatus(1).each { g ->
                 try {
+                    if (!g.isAttached()) {
+                        g.attach()
+                    }
                     log.debug("Entering status check for ${g.shortName} with status ${g.provisionStatus}")
                     def provCount = ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(1, g)
                     def unProvCount = ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(0, g)
@@ -84,6 +87,9 @@ class ProvisionedInstanceGroupStatusJob {
         if (ProvisionedInstanceGroup.countByProvisionStatus(4) > 0) { 
             ProvisionedInstanceGroup.findAllByProvisionStatus(4).each { g ->
                 try {
+                    if (!g.isAttached()) {
+                        g.attach()
+                    }
                     log.debug("Entering destroy status check for ${g.shortName} with status ${g.provisionStatus}")
                     def undestroyedCount = ProvisionedInstance.countByProvisionStatusBetweenAndProvisionedInstanceGroup(4, 5, g)
                     log.debug("Current count in undestroyed: ${undestroyedCount}")

@@ -54,8 +54,11 @@ class InstanceProvisionerJob {
                 // Provision the next 5.
                 ProvisionedInstance.findAllByProvisionStatus(0,[max: (csCfg.maxProvDestroy - provCount), sort: 'id']).each { i ->
                     log.debug("...provisioning ${i.hostname}")
+                    if (!i.isAttached()) {
+                        i.attach()
+                    }
                     i.provisionStatus = 1
-                    i.merge(flush:true)
+                    i = i.merge(flush:true)
 
                     try { 
                         if (templates["${i.provisionedInstanceGroup.id}_${i.role}"] == null) {
@@ -93,6 +96,9 @@ class InstanceProvisionerJob {
         try {
             ProvisionedInstanceGroup.findAllByProvisionStatus(6).each { g ->
                 g.provisionedInstances.each { pi ->
+                    if (!pi.isAttached()) {
+                        pi.attach()
+                    }
                     if (pi.provisionStatus == 3) {
                         if (pi.instanceId != null) { 
                             log.debug("Destroying instance ${pi.hostname} from cancelled group ${g.shortName}")
@@ -127,6 +133,9 @@ class InstanceProvisionerJob {
                 log.debug("destroying the next round of ${csCfg.maxProvDestroy - destroyingCount}")
                 // Provision the next 5.
                 ProvisionedInstance.findAllByProvisionStatus(4,[max: (csCfg.maxProvDestroy - destroyingCount)]).each { i ->
+                    if (!i.isAttached()) {
+                        i.attach()
+                    }
                     if (i.instanceId == null) {
                         log.debug("...marking non-existent instance ${i.hostname} as destroyed")
                         i.provisionStatus = 6
@@ -134,7 +143,7 @@ class InstanceProvisionerJob {
                     } else { 
                         log.debug("...destroying ${i.hostname}")
                         i.provisionStatus = 5
-                        i.merge(flush:true)
+                        i = i.merge(flush:true)
                         executorService.execute { 
                             computeSvc.destroyNode(i.instanceId)
                             i.provisionStatus = 6
