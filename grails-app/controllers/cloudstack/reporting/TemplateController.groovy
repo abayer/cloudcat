@@ -26,7 +26,9 @@ class TemplateController {
         } else {
             found = "false"
         }
-        render found
+        response.setContentType("text/json;charset=UTF-8");
+
+        render found  
     }
     
     def templateListAJAX() {
