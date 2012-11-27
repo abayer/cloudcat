@@ -197,6 +197,12 @@ class InstanceProvisionerJob {
         log.debug("did network bits")
         def template = templateBuilder.build()
 
+        if (csCfg.instanceAdminUser != null) { 
+            LoginCredentials lc = LoginCredentials.builder().user(csCfg.instanceAdminUser).password(csCfg.instanceAdminPassword).build()
+            template.getOptions().overrideLoginCredentials(lc)
+            log.debug("Setting creds for ${csCfg.instanceAdminUser}")
+        }
+
         return template
 
     }
@@ -250,19 +256,23 @@ class InstanceProvisionerJob {
             try {
                 def runScript
                 if (provisionGroup.initScript != null) {
-                    runScript = Statements.exec(provisionGroup.initScript)
-
-                    def execResp = computeSvc.runScriptOnNode(vm.getNodeId(), runScript)
-                    if (execResp.getExitStatus() > 0) {
-                        log.debug("runScript error")
-                        adminCtx.getGlobalContext().getApi().getVirtualMachineClient().destroyVirtualMachine(vm.getNode().id)       
-                        if (retriesLeft == 1) {
-                            provisionedInstance.provisionStatus = 2
-                            provisionedInstance.errorMsg = "${execResp.getError()}: ${execResp.getOutput()}"
-                            provisionedInstance.save(flush:true)
-                            log.error("Errors when running script on instance ${provisionedInstance.instanceName} for group ${provisionGroup.shortName}: ${provisionedInstance.errorMsg}")
+                    if (csCfg.instanceAdminUser != null) { 
+                        runScript = Statements.exec(provisionGroup.initScript)
+                        
+                        def execResp = computeSvc.runScriptOnNode(vm.getNodeId(), runScript)
+                        if (execResp.getExitStatus() > 0) {
+                            log.debug("runScript error")
+                            adminCtx.getGlobalContext().getApi().getVirtualMachineClient().destroyVirtualMachine(vm.getNode().id)       
+                            if (retriesLeft == 1) {
+                                provisionedInstance.provisionStatus = 2
+                                provisionedInstance.errorMsg = "${execResp.getError()}: ${execResp.getOutput()}"
+                                provisionedInstance.save(flush:true)
+                                log.error("Errors when running script on instance ${provisionedInstance.instanceName} for group ${provisionGroup.shortName}: ${provisionedInstance.errorMsg}")
+                            }
+                            return 0
                         }
-                        return 0
+                    } else {
+                        log.warning("Can not run init script on instance ${provisionedInstance.instanceName}: no instance admin user specified")
                     }
                 }
             } catch (Exception e) {

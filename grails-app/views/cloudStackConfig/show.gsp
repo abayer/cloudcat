@@ -87,6 +87,25 @@
 				</li>
 				</g:if>
 
+                                <g:if test="${cloudStackConfigInstance?.instanceAdminUser}">
+				<li class="fieldcontain">
+					<span id="instanceAdminUser-label" class="property-label"><g:message code="cloudStackConfig.instanceAdminUser.label" default="Instance Admin User" /></span>
+					
+						<span class="property-value" aria-labelledby="instanceAdminUser-label"><g:fieldValue bean="${cloudStackConfigInstance}" field="instanceAdminUser"/></span>
+					
+				</li>
+				</g:if>
+
+				<g:if test="${cloudStackConfigInstance?.instanceAdminPassword}">
+				<li class="fieldcontain">
+					<span id="instanceAdminPassword-label" class="property-label"><g:message code="cloudStackConfig.instanceAdminPassword.label" default="Instance Admin Password" /></span>
+					
+						<span class="property-value" aria-labelledby="instanceAdminPassword-label">(hidden)</span>
+					
+				</li>
+				</g:if>
+
+
 				<g:if test="${cloudStackConfigInstance?.emailDomain}">
 				<li class="fieldcontain">
 					<span id="emailDomain-label" class="property-label"><g:message code="cloudStackConfig.emailDomain.label" default="Email Domain" /></span>

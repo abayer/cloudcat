@@ -26,6 +26,8 @@ class CloudStackConfig {
     String emailDomain
     boolean setupStaticNat
     String networkId
+    String instanceAdminUser
+    String instanceAdminPassword
     
     int maxProvDestroy = 10
     Date lastUpdated
@@ -40,5 +42,7 @@ class CloudStackConfig {
         maxProvDestroy(min:1)
         setupStaticNat(nullable:true)
         networkId(nullable:true)
+        instanceAdminUser(nullable:true)
+        instanceAdminPassword(nullable:true)
     }
 }

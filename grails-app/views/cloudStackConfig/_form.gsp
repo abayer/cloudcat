@@ -58,6 +58,20 @@
 	<g:textField name="alertEmailFrom" required="" value="${cloudStackConfigInstance?.alertEmailFrom}"/>
 </div>
 
+<div class="fieldcontain ${hasErrors(bean: cloudStackConfigInstance, field: 'instanceAdminUser', 'error')}">
+	<label for="instanceAdminUser">
+		<g:message code="cloudStackConfig.instanceAdminUser.label" default="Instance Admin User" />
+	</label>
+	<g:textField name="instanceAdminUser" required="" value="${cloudStackConfigInstance?.instanceAdminUser}"/>
+</div>
+
+<div class="fieldcontain ${hasErrors(bean: cloudStackConfigInstance, field: 'instanceAdminPassword', 'error')}">
+	<label for="instanceAdminPassword">
+		<g:message code="cloudStackConfig.instanceAdminPassword.label" default="Instance Admin Password" />
+	</label>
+	<g:field type="password" name="instanceAdminPassword" required="" value="${cloudStackConfigInstance?.instanceAdminPassword}"/>
+</div>
+
 <div class="fieldcontain ${hasErrors(bean: cloudStackConfigInstance, field: 'emailDomain', 'error')}">
 	<label for="emailDomain">
 		<g:message code="cloudStackConfig.emailDomain.label" default="Email Domain" />

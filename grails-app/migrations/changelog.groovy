@@ -1038,4 +1038,6 @@ databaseChangeLog = {
 
 
 	include file: 'add-network-options-to-cscfg.groovy'
+
+	include file: 'instance-admin-in-config.groovy'
 }
