@@ -38,8 +38,24 @@ class InstanceController {
     }
     
     def filterBase = {
-        [instanceInstanceList: filterPaneService.filter(params, Instance).collect { def i = Instance.read(it.id); i.reportRuns = []; i.cpuUsages = []; i},
-         instanceInstanceTotal: filterPaneService.count(params, Instance),
+        def latestReportRunId = ReportRun.findAllByCompleted(true).collect { it.id }.max()
+        
+        def queryReportRun = ReportRun.get(params.reportRun ? params.reportRun.toLong() : latestReportRunId)
+        
+        def qParams = params.clone()
+
+        if (params['filter.op.lastUpdated'] == null || params['filter.op.lastUpdated'] == "") {
+            qParams.filter = [:]
+            qParams.filter.op = [:]
+            qParams.filter.Instance = [:]
+            
+            qParams.filter.lastUpdated = queryReportRun.dateCreated
+            qParams.filter.op.lastUpdated = "GreaterThanEquals" 
+            qParams.filter.Instance.lastUpdated_isDayPrecision = "n"
+        }
+        
+        [instanceInstanceList: filterPaneService.filter(qParams, Instance).collect { def i = Instance.read(it.id); i.reportRuns = []; i.cpuUsages = []; i},
+         instanceInstanceTotal: filterPaneService.count(qParams, Instance),
          filterParams: org.grails.plugin.filterpane.FilterPaneUtils.extractFilterParams(params), 
          params:params]
     }

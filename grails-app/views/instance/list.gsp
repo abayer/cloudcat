@@ -36,7 +36,8 @@
 		</div>
                 <div>
                   <filterpane:filterPane domain="cloudstack.reporting.Instance"
-                                         filterProperties="name,account,size,serviceOfferingName,templateName,state"
+                                         filterProperties="name,account,size,serviceOfferingName,templateName,state,lastUpdated"
+                                         additionalProperties="lastUpdated"
                                          titleKey="fp.tag.filterPane.titleText"/>
                   <filterpane:currentCriteria style="margin-left: 5%; margin-top: 1em;" domainBean="${Instance}" />
                 </div>
