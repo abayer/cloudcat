@@ -98,6 +98,7 @@ class InstanceProvisionerJob {
                 g.provisionedInstances.each { pi ->
                     if (!pi.isAttached()) {
                         pi.attach()
+                        pi.refresh()
                     }
                     if (pi.provisionStatus == 3) {
                         if (pi.instanceId != null) { 
@@ -135,6 +136,7 @@ class InstanceProvisionerJob {
                 ProvisionedInstance.findAllByProvisionStatus(4,[max: (csCfg.maxProvDestroy - destroyingCount)]).each { i ->
                     if (!i.isAttached()) {
                         i.attach()
+                        i.refresh()
                     }
                     if (i.instanceId == null) {
                         log.debug("...marking non-existent instance ${i.hostname} as destroyed")

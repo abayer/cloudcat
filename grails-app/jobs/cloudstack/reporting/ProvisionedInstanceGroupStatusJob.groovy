@@ -36,6 +36,7 @@ class ProvisionedInstanceGroupStatusJob {
                 try {
                     if (!g.isAttached()) {
                         g.attach()
+                        g.refresh()
                     }
                     log.debug("Entering status check for ${g.shortName} with status ${g.provisionStatus}")
                     def provCount = ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(1, g)
@@ -89,6 +90,7 @@ class ProvisionedInstanceGroupStatusJob {
                 try {
                     if (!g.isAttached()) {
                         g.attach()
+                        g.refresh()
                     }
                     log.debug("Entering destroy status check for ${g.shortName} with status ${g.provisionStatus}")
                     def undestroyedCount = ProvisionedInstance.countByProvisionStatusBetweenAndProvisionedInstanceGroup(4, 5, g)
