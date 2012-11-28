@@ -38,9 +38,10 @@ class ProvisionedInstanceGroupStatusJob {
                         g.attach()
                         g.refresh()
                     }
+                    g.lock()
                     log.debug("Entering status check for ${g.shortName} with status ${g.provisionStatus}")
-                    def provCount = ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(1, g)
-                    def unProvCount = ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(0, g)
+                    def provCount = ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(1, g, [readOnly: true])
+                    def unProvCount = ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(0, g, [readOnly: true])
                     log.debug("Current count in unprovisioned: ${unProvCount}")
                     log.debug("Current count in provisioning: ${provCount}")
                     
@@ -48,7 +49,7 @@ class ProvisionedInstanceGroupStatusJob {
                         log.debug("instances are still provisioning")
                     } else {
                         // If there are instances with errors...
-                        if (ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(2, g) > 0) {
+                        if (ProvisionedInstance.countByProvisionStatusAndProvisionedInstanceGroup(2, g, [readOnly: true]) > 0) {
                             log.debug("setting group status to 2")
                             g.provisionStatus = 2
                         } else {
@@ -88,12 +89,13 @@ class ProvisionedInstanceGroupStatusJob {
         if (ProvisionedInstanceGroup.countByProvisionStatus(4) > 0) { 
             ProvisionedInstanceGroup.findAllByProvisionStatus(4).each { g ->
                 try {
+                    g.lock()
                     if (!g.isAttached()) {
                         g.attach()
                         g.refresh()
                     }
                     log.debug("Entering destroy status check for ${g.shortName} with status ${g.provisionStatus}")
-                    def undestroyedCount = ProvisionedInstance.countByProvisionStatusBetweenAndProvisionedInstanceGroup(4, 5, g)
+                    def undestroyedCount = ProvisionedInstance.countByProvisionStatusBetweenAndProvisionedInstanceGroup(4, 5, g, [readOnly: true])
                     log.debug("Current count in undestroyed: ${undestroyedCount}")
                     
                     if (undestroyedCount > 0) {
