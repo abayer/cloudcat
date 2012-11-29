@@ -32,5 +32,6 @@ class ProvisionedInstance {
 
     static mapping = {
         errorMsg type:'text'
+        version false
     }
 }
