@@ -13,3 +13,8 @@ So now you should be able to login, at the very least, and probably provision in
 ./grailsw prod dbm-update
 
 That'll update the cloudcat database in mysql to the latest migration. If you're making changes to domain classes, you'll need to do "./grailsw prod dbm-gorm-diff (filename).groovy -add", and then add grails-app/migrations/changelog.groovy and .../(filename).groovy to your commit, and run "./grailsw prod dbm-update" locally as well. Probably a good idea to run "./grailsw prod dbm-validate" after the diff, actually.
+
+## Demo
+
+A demo instance is up at http://cloudcat.andrewbayer.com, though you
+can't login at this point.
