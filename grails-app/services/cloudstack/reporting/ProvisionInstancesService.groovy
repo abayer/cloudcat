@@ -79,15 +79,19 @@ class ProvisionInstancesService {
         g.provisionStatus = 1
         g.save(flush:true)
         log.warn("Setting group status to 1 in theory - ${g.provisionStatus}")
-        if (g.secondaryCount != null && g.secondaryCount != 0) {
-            log.warn("in secondary spawn")
-            for (altCnt in 1..(g.secondaryCount)) {
-                createInstanceRecord(g, "Alternate", altCnt)
+        if (g.secondaryCount > 0 ||  g.primaryCount > 1) { 
+            if (g.secondaryCount != null && g.secondaryCount != 0) {
+                log.warn("in secondary spawn")
+                for (altCnt in 1..(g.secondaryCount)) {
+                    createInstanceRecord(g, "Alternate", altCnt)
+                }
             }
-        }
-
-        for (cnt in 1..(g.primaryCount)) {
-            createInstanceRecord(g, "Standard", cnt + g.secondaryCount)
+            
+            for (cnt in 1..(g.primaryCount)) {
+                createInstanceRecord(g, "Standard", cnt + g.secondaryCount)
+            }
+        } else {
+            createInstanceRecord(g, "Standard", null)
         }
         g.save(flush:true)
 
@@ -101,7 +105,11 @@ class ProvisionInstancesService {
         def i = new ProvisionedInstance()
         i.role = role
         i.provisionStatus = 0
-        i.instanceName = "${g.shortName}-${g.offset + cnt}"
+        if (cnt != null) { 
+            i.instanceName = "${g.shortName}-${g.offset + cnt}"
+        } else {
+            i.instanceName = "${g.shortName}"
+        }
         i.hostname = "${i.instanceName}"
         i.save(flush:true)
         g.addToProvisionedInstances(i)

@@ -51,6 +51,9 @@ class ProvisionedInstanceGroup {
             if (ProvisionedInstance.findByInstanceNameLikeAndProvisionStatusNotEqualAndProvisionedInstanceGroupNotEqual("${testName}-${testOffset + cnt}%", 9, g)) {
                 return false
             }
+            if (ProvisionedInstance.findByInstanceNameAndProvisionStatusNotEqualAndProvisionedInstanceGroupNotEqual("${testName}", 9, g)) {
+                return false
+            }
         }
         
         return true
