@@ -71,12 +71,12 @@ class ProvisionedInstanceGroupController {
 
     @Secured(['IS_AUTHENTICATED_REMEMBERED'])
     def save() {
-        log.warn("In save")
-        if (params.templateChooser == 2) {
+        log.warn("In save params")
+        if (params.templateChooser == "2") {
             params.template.id = Template.findByName(params.templateText).id
+            params."template.id" = Template.findByName(params.templateText).id
         }
         def provGroup = new ProvisionedInstanceGroup(params)
-        
         if (!provGroup.save(flush: true)) {
             render(view: "create", model: [provisionedInstanceGroupInstance: provGroup, templateChooser:params.templateChooser as int])
             return

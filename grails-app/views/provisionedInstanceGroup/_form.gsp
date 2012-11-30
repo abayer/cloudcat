@@ -22,7 +22,7 @@
 <div class="fieldcontain">
   <label for="template">
   </label>
-  <g:select style="${templateChooser == null || templateChooser == 1 ? '' : 'display: none'}" id="templateDropDown" name="template.id" from="${Template.findAllByFeatured(true, [sort: 'name'])}" optionKey="id" optionValue="${{it.displayText + ' (' + it.name + ')'}}" required="" value="${provisionedInstanceGroupInstance?.template?.id}" class="many-to-one"/>
+  <g:select style="${templateChooser == null || templateChooser == 1 ? '' : 'display: none'}" id="templateDropDown" name="template.id" from="${Template.findAllByFeatured(true, [sort: 'name'])}" optionKey="id" optionValue="${{it.displayText + ' (' + it.name + ')'}}" value="${provisionedInstanceGroupInstance?.template?.id}" class="many-to-one"  noSelection="['null': '']"/>
 
 <g:field type="textfield" size="64" id="templateTextField" name="templateText" value="${provisionedInstanceGroupInstance?.template?.name}" style="${templateChooser == 2 ? '' : 'display: none'}" autocomplete="true" required=""/>
 </div>
