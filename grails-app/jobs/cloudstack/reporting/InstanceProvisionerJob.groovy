@@ -58,6 +58,7 @@ class InstanceProvisionerJob {
                         i.attach()
                     }
                     i.provisionStatus = 1
+                    i.errorMsg = ""
                     i = i.merge(flush:true)
 
                     try { 
