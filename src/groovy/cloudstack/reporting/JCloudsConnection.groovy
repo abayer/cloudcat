@@ -22,6 +22,7 @@ import org.jclouds.ContextBuilder;
 import org.jclouds.apis.Apis
 import org.jclouds.cloudstack.compute.strategy.CloudStackComputeServiceAdapter
 import org.jclouds.cloudstack.domain.VirtualMachine
+import org.jclouds.cloudstack.CloudStackApiMetadata;
 import org.jclouds.cloudstack.CloudStackContext
 import org.jclouds.cloudstack.internal.CloudStackContextImpl
 import org.jclouds.compute.ComputeService
@@ -81,13 +82,11 @@ class JCloudsConnection {
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "GlobalAccountClient", "360000")
         overrides.setProperty(Constants.PROPERTY_TIMEOUTS_PREFIX + "AccountClient", "360000")
         
-        // correct the classloader so that extensions can be found
-        Thread.currentThread().setContextClassLoader(Apis.class.getClassLoader())
-        return ContextBuilder.newBuilder("cloudstack")
-        .credentials(identity, credential)
-        .overrides(overrides)
-        .modules(getModules())
-        .buildView(ComputeServiceContext.class)
+        return ContextBuilder.newBuilder(new CloudStackApiMetadata())
+                             .credentials(identity, credential)
+                             .overrides(overrides)
+                             .modules(getModules())
+                             .buildView(ComputeServiceContext.class)
     }
 
 }
