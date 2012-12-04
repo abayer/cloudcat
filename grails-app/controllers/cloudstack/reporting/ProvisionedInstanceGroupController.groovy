@@ -35,8 +35,13 @@ class ProvisionedInstanceGroupController {
     }
     
     def filterBase = {
-        [provisionedInstanceGroupInstanceList: filterPaneService.filter(params, ProvisionedInstanceGroup),
-         provisionedInstanceGroupInstanceTotal: filterPaneService.count(params, ProvisionedInstanceGroup),
+        def qParams = params.clone()
+
+        if (params['filter.provisionStatus'] != null && params['filter.provisionStatus'] != "") {
+            qParams.filter.provisionStatus = "${ProvisionedInstanceStatus.groupStatuses.indexOf(params['filter.provisionStatus'])}"
+        }
+        [provisionedInstanceGroupInstanceList: filterPaneService.filter(qParams, ProvisionedInstanceGroup),
+         provisionedInstanceGroupInstanceTotal: filterPaneService.count(qParams, ProvisionedInstanceGroup),
          filterParams: org.grails.plugin.filterpane.FilterPaneUtils.extractFilterParams(params), 
          params:params]
     }

@@ -21,7 +21,8 @@
                   <filterpane:filterPane domain="cloudstack.reporting.ProvisionedInstanceGroup"
                                          filterProperties="username,shortName,provisionStatus,description,dateCreated"
                                          associatedProperties="template.name,team.authority,primaryServiceOffering.name,alternateServiceOffering.name"
-                                         titleKey="fp.tag.filterPane.titleText"/>
+                                         titleKey="fp.tag.filterPane.titleText"
+                                         filterPropertyValues="${[provisionStatus:[values:ProvisionedInstanceStatus.groupStatuses]]}"/>
                   <filterpane:currentCriteria style="margin-left: 5%; margin-top: 1em;" domainBean="${ProvisionedInstanceGroup}" />
                 </div>
 		<div id="list-provisionedInstanceGroup" class="content scaffold-list" role="main">

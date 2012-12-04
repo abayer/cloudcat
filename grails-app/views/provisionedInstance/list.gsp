@@ -19,7 +19,8 @@
                 <div>
                   <filterpane:filterPane domain="cloudstack.reporting.ProvisionedInstance"
                                          associatedProperties="provisionedInstanceGroup.username,provisionedInstanceGroup.shortName,provisionedInstanceGroup.template.name,provisionedInstanceGroup.team.authority,provisionedInstanceGroup.primaryServiceOffering.name,provisionedInstanceGroup.alternateServiceOffering.name"
-                                         titleKey="fp.tag.filterPane.titleText"/>
+                                         titleKey="fp.tag.filterPane.titleText"
+                                         filterPropertyValues="${[provisionStatus:[values:ProvisionedInstanceStatus.instanceStatuses]]}"/>
                   
                   <filterpane:currentCriteria style="margin-left: 5%; margin-top: 1em;" domainBean="${ProvisionedInstance}" />
                 </div>
