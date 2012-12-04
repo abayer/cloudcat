@@ -1,6 +1,7 @@
 
 <%@ page import="cloudstack.reporting.ProvisionedInstance" %>
 <%@ page import="cloudstack.reporting.Instance" %>
+<%@ page import="cloudstack.reporting.ReportRun" %>
 <%@ page import="cloudstack.reporting.ProvisionedInstanceStatus" %>
 <!DOCTYPE html>
 <html>
@@ -58,7 +59,7 @@
 						<span class="property-value" aria-labelledby="instanceId-label"><g:fieldValue bean="${provisionedInstanceInstance}" field="instanceId"/></span>
 					
 				</li>
-                                <g:if test="${Instance.findByInstanceId(provisionedInstanceInstance?.instanceId) != null}">
+                                <g:if test="${Instance.findByInstanceIdAndLastUpdatedGreaterThanEquals(provisionedInstanceInstance?.instanceId, ReportRun.findAllByCompleted(true).collect { it.dateCreated }.max()) != null}">
 				<li class="fieldcontain">
 					<span id="instanceStatus-label" class="property-label"><g:message code="provisionedInstance.instanceStatus.label" default="Monitoring Status" /></span>
 					
