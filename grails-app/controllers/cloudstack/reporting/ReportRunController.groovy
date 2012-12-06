@@ -33,6 +33,7 @@ class ReportRunController {
         params.max = Math.min(max ?: 10, 100)
         params.sort = params.sort ?: "id"
         params.order = params.order ?: "desc"
+        params.completed = true
         [reportRunList: ReportRun.list(params), reportRunTotal: ReportRun.count()]
     }
 

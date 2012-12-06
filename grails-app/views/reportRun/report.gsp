@@ -41,12 +41,12 @@
 			<table>
 				<thead>
 					<tr>
-                                          <g:sortableColumn property="account" title="Account" />
+                                          <g:sortableColumn params="[reportRunId: latestReportRun.id]" property="account" title="Account" />
                                           <g:each in="${topSizes}" status="i" var="instanceSize">
-                                            <g:sortableColumn property="${instanceSize}" title="${instanceSize.length() > 10 ? instanceSize[0..6] + '...' : instanceSize }" />
+                                            <g:sortableColumn params="[reportRunId: latestReportRun.id]" property="${instanceSize}" title="${instanceSize.length() > 10 ? instanceSize[0..6] + '...' : instanceSize }" />
                                           </g:each>
-                                          <g:sortableColumn property="other" title="Other" />
-                                          <g:sortableColumn property="total" title="Total Count" />
+                                          <g:sortableColumn params="[reportRunId: latestReportRun.id]" property="other" title="Other" />
+                                          <g:sortableColumn params="[reportRunId: latestReportRun.id]" property="total" title="Total Count" />
 					</tr>
 				</thead>
 				<tbody>
