@@ -50,17 +50,17 @@
 				<thead>
 					<tr>
                                           
-                                          <g:sortableColumn param="${filterParams}" property="name" title="${message(code: 'instance.name.label', default: 'Instance Name')}" />
+                                          <g:sortableColumn params="${filterParams}" property="name" title="${message(code: 'instance.name.label', default: 'Instance Name')}" />
                                           
-                                          <g:sortableColumn param="${filterParams}" property="account" title="${message(code: 'instance.account.label', default: 'Account')}" />
+                                          <g:sortableColumn params="${filterParams}" property="account" title="${message(code: 'instance.account.label', default: 'Account')}" />
                                           
-                                          <g:sortableColumn param="${filterParams}" property="serviceOfferingName" title="${message(code: 'instance.serviceOfferingName.label', default: 'Size')}" />
+                                          <g:sortableColumn params="${filterParams}" property="serviceOfferingName" title="${message(code: 'instance.serviceOfferingName.label', default: 'Size')}" />
                                           
-                                          <g:sortableColumn param="${filterParams}" property="publicIPs" title="${message(code: 'instance.publicIPs.label', default: 'IP')}" />
+                                          <g:sortableColumn params="${filterParams}" property="publicIPs" title="${message(code: 'instance.publicIPs.label', default: 'IP')}" />
                                           
-                                          <g:sortableColumn param="${filterParams}" property="state" title="${message(code: 'instance.state.label', default: 'State')}" />
+                                          <g:sortableColumn params="${filterParams}" property="state" title="${message(code: 'instance.state.label', default: 'State')}" />
 
-                                          <g:sortableColumn param="${filterParams}" property="created" title="${message(code: 'instance.created.label', default: 'Created')}" />
+                                          <g:sortableColumn params="${filterParams}" property="created" title="${message(code: 'instance.created.label', default: 'Created')}" />
                                           
 					</tr>
 				</thead>
